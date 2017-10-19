@@ -18,12 +18,30 @@
 window.findNRooksSolution = function(n) {
   let solution = undefined;
   let rookBoard = new Board({n: n});
-  let rowsArr = Array(n);
+  let col = 0;
+  
   if (n === 1) {
     solution = [[1]];
   }
   
-  for(// loop through rookBoard) 
+  for (let row = 0; row < n; row++, col++) {
+    if (col === n) {
+      col = 0;
+    }
+    // toggle row, col
+    if (row === 0) {
+      rookBoard.togglePiece(row, col);
+    } else {
+      rookBoard.togglePiece(row, col);
+      if (rookBoard.hasAnyRooksConflicts()) {
+        rookBoard.togglePiece(row, col);
+      }
+    }
+    
+  }
+  
+  solution = rookBoard.rows();
+  //for(var i;){}// loop through rookBoard) 
     // loop through row array
     //   use rookBoard.togglePiece(row, col)
     //   

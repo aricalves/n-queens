@@ -76,28 +76,37 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   let solution = undefined; //fixme
   let queenBoard = new Board({n: n});
+  let reset = false;
+  let indexStorage = {};
   
-  let rowSolutionFinder = function(rowArray, row, col) {
-    col = col || 0;
+  
+  let rowSolutionFinder = function(row, col) {
     let reset = false;
+    if (row === 0 && n % 2 === 0) { col = 2; }
+    
+    col = col || 0;
     // toggle piece on 
     queenBoard.togglePiece(row, col);
+    indexStorage[row] = col;
     // check if any collision
     if (queenBoard.hasAnyQueensConflicts()) {
       // true: toggle piece off
       queenBoard.togglePiece(row, col);
-      // increment col 
+      delete indexStorage[row];
+      // increment col
+      if (reset && col === n) {
+        for (let key in indexStorage) {
+          queenBoard.togglePiece(key, indexStorage[key]);
+        }
+        row = 0;
+        reset = false;
+      }
       if (col === n) {
         col = 0;
         reset = true;
-      } else if (col === n && reset) {
-        reset = false;
-        rowSolutionFinder(queenBoard.get(row - 1), row - 1, col + 1);
-      } else {
-        col++;
       }
-      // then recurse using next col
-      rowSolutionFinder(queenBoard.get(row), row, col);
+      
+      rowSolutionFinder(row, col + 1);
     } else {
       // false: return 
       return; 
@@ -105,17 +114,21 @@ window.findNQueensSolution = function(n) {
   };
   
   for (let row = 0; row < n; row++) {
-    rowSolutionFinder(queenBoard.get(row), row);
+    rowSolutionFinder(row);
   }
   
   solution = queenBoard.rows();
   
-  if (n === 2 || n === 3) {
-    solution = [];
+  if (n === 2) {
+    solution = [[0, 0], [0, 0]];
+  }
+  if (n === 3) {
+    solution = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   }
   
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
+  
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other

@@ -74,56 +74,48 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  let solution = undefined; //fixme
+  let solution = []; //fixme
   let queenBoard = new Board({n: n});
-  let reset = false;
-  let indexStorage = {};
-  
-  
-  let rowSolutionFinder = function(row, col) {
-    let reset = false;
-    if (row === 0 && n % 2 === 0) { col = 2; }
-    
-    col = col || 0;
-    // toggle piece on 
-    queenBoard.togglePiece(row, col);
-    indexStorage[row] = col;
-    // check if any collision
-    if (queenBoard.hasAnyQueensConflicts()) {
-      // true: toggle piece off
-      queenBoard.togglePiece(row, col);
-      delete indexStorage[row];
-      // increment col
-      if (reset && col === n) {
-        for (let key in indexStorage) {
-          queenBoard.togglePiece(key, indexStorage[key]);
-        }
-        row = 0;
-        reset = false;
-      }
-      if (col === n) {
-        col = 0;
-        reset = true;
-      }
-      
-      rowSolutionFinder(row, col + 1);
-    } else {
-      // false: return 
-      return; 
+  if (n === 0) {
+    return [];
+  }
+  if (n === 1) {
+    return [[1]];
+  }
+  // for (let c = 0; c < n; c++) {
+  let findDatKween = function(row, col) {
+    if (col > n) {
+      col = 0;
     }
+    col = col || 0;
+    if (n === 4) {
+    // debugger;      
+    }
+    // for (let c = 0; c < n; c++) {
+    queenBoard.togglePiece(row, col);
+      console.log(JSON.stringify(queenBoard.rows()));
+    if (!queenBoard.hasAnyQueensConflicts()) {
+      if (row === n - 1) {
+        solution = (queenBoard.rows());
+        // break;
+      } else {
+        findDatKween(row + 1);
+      }
+    } else if (col === n - 1 && queenBoard.hasAnyQueensConflicts()) {
+      queenBoard = new Board({n: n});
+      // continue;
+    } else {
+      queenBoard.togglePiece(row, col);
+      
+      findDatKween(row, col + 1);
+    }
+      
+    // }
+   
   };
-  
-  for (let row = 0; row < n; row++) {
-    rowSolutionFinder(row);
-  }
-  
-  solution = queenBoard.rows();
-  
-  if (n === 2) {
-    solution = [[0, 0], [0, 0]];
-  }
-  if (n === 3) {
-    solution = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+   
+  for (let c = 0; c < n; c++) {
+    findDatKween(0, c);
   }
   
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
